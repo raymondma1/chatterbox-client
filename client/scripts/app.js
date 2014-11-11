@@ -1,10 +1,13 @@
 // YOUR CODE HERE:
 
 var app = {
-  init: function(){},
+  server: 'https://api.parse.com/1/classes/chatterbox',
+  init: function(){
+    app.fetch();
+  },
   send: function(message){
     $.ajax({
-      url: 'https://api.parse.com/1/classes/chatterbox',
+      url: app.server,
       type: 'POST',
       data: JSON.stringify(message),
       contentType: 'application/json',
@@ -12,13 +15,13 @@ var app = {
         console.log('chatterbox: message sent');
       },
       error: function(data) {
-        console.error('chatterbox: Failed to send message');
+        console.error('chatterbox: Failed to send message', data);
       }
     });
   },
   fetch: function() {
     $.ajax({
-      url: 'https://api.parse.com/1/classes/chatterbox',
+      url: app.server,
       dataType: 'json',
       contentType: 'application/json',
       success: function(data) {
@@ -45,14 +48,45 @@ var app = {
     $('#roomSelect').append(cRoom);
   },
   addFriend: function(username) {
+    app.friends[username] = true;
+  },
+  handleSubmit: function(message) {
+    app.send(message);
+  },
+  friends: {},
+  makeID: function() {
+    var text = "";
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
-
+    for( var i=0; i < 10; i++ ) {
+      text += possible.charAt(Math.floor(Math.random() * possible.length));
+    }
+    return text;
   }
 };
 
+
+
 $(document).ready(function() {
-  app.fetch();
-  $('#chats').on('click','.username',function() {
-    console.log("click event")
+  app.init();
+  $('#chats').on('click', '.username', function(event) {
+    var friend = event.currentTarget.textContent;
+    app.addFriend(friend);
   });
+  $('#send').on('submit', function(event) {
+    var text = $('#message').val();
+    var time = new Date(event.timeStamp).toISOString();
+    var msg = {
+      username: "secret",
+      text: text,
+      roomname: "",
+      createdAt: time,
+      updatedAt: time,
+      objectId: app.makeID()
+    }
+    event.preventDefault();
+    console.log("message", msg);
+    app.handleSubmit(msg);
+
+  })
 });
