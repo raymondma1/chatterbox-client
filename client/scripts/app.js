@@ -22,9 +22,12 @@ var app = {
   fetch: function() {
     $.ajax({
       url: app.server,
+      type: 'GET',
+      data: {order: '-createdAt'},
       dataType: 'json',
       contentType: 'application/json',
       success: function(data) {
+        data.results.reverse();
         _.each(data.results,function(message){
           app.addMessage(message);
         });
@@ -38,10 +41,15 @@ var app = {
     $('#chats').empty();
   },
   addMessage: function(message) {
-    var username = $('<div class="username">').text(message.username);
-    var text = $('<div>').text(message.text);
-    var msg = $('<div class = "chat">').append(username).append(text);
-    $('#chats').append(msg);
+    if (message.text && !app.objectIds[message.objectId]) {
+      var username = $('<div class="username">').text(message.username);
+      var text = $('<div>').text(message.text);
+      var time = $('<div>').text(message.createdAt);
+      var msg = $('<div class = "chat">').append(username).append(text).append(time);
+      var msgId = message.objectId;
+        app.objectIds[msgId]=true;
+        $('#chats').prepend(msg);
+    }
   },
   addRoom: function(room) {
     var cRoom = $('<input type="radio" name="room" value="' + room  +'">' + room)
@@ -54,7 +62,7 @@ var app = {
     app.send(message);
   },
   friends: {},
-  makeID: function() {
+  makeId: function() {
     var text = "";
     var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
@@ -62,7 +70,8 @@ var app = {
       text += possible.charAt(Math.floor(Math.random() * possible.length));
     }
     return text;
-  }
+  },
+  objectIds: {}
 };
 
 
@@ -78,15 +87,18 @@ $(document).ready(function() {
     var time = new Date(event.timeStamp).toISOString();
     var msg = {
       username: "secret",
-      text: text,
-      roomname: "",
-      createdAt: time,
-      updatedAt: time,
-      objectId: app.makeID()
+      text: text
+      //roomname: "lobby",
+      //createdAt: time,
+      //updatedAt: time,
+      //objectId: app.makeId()
     }
     event.preventDefault();
-    console.log("message", msg);
     app.handleSubmit(msg);
-
+    app.fetch();
+  });
+  $('#refresh').on('submit', function(event) {
+    event.preventDefault();
+    app.fetch();
   })
 });

@@ -16,14 +16,18 @@
     <div id="main">
       <h1>chatterbox</h1>
       <!-- Your HTML goes here! -->
-      <form action="" id="roomSelect">
-      <input type="radio" name="room" value="test">test
-      <input type="radio" name="room" value="test2">test2
-
+      <form action="#" id="roomSelect">
+        <input type="radio" name="room" value="test">test
+        <input type="radio" name="room" value="test2">test2
       </form>
-      <form action="" id="send">
-      <input id="message" type="text" name="sendmessage">
-      <input type="submit" value="Send">
+
+      <form action="#" id="send" method="post">
+        <input id="message" type="text" name="message">
+        <input type="submit" name="submit" class="submit" value="Send">
+      </form>
+
+      <form action="#" id="refresh">
+        <input type="submit" value="Refresh">
       </form>
       <div id="chats"></div>
     </div>
