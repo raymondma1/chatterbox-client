@@ -16,9 +16,10 @@
     <div id="main">
       <h1>chatterbox</h1>
       <!-- Your HTML goes here! -->
-      <form action="#" id="roomSelect">
-        <input type="radio" name="room" value="test">test
-        <input type="radio" name="room" value="test2">test2
+
+      <form action="#" id="select-room" method="post">
+        <input id="room" type="text" name="room">
+        <input type="submit" name="submit" class="submit" value="Enter Room">
       </form>
 
       <form action="#" id="send" method="post">

@@ -39,16 +39,26 @@ var app = {
   },
   clearMessages: function() {
     $('#chats').empty();
+    app.objectIds = {};
   },
   addMessage: function(message) {
+    console.log(message.roomname);
+    //console.log(app.objectIds);
     if (message.text && !app.objectIds[message.objectId]) {
-      var username = $('<div class="username">').text(message.username);
+      var username = $('<div class="username">')
+        .text(message.username)
+      if (app.friends[message.username]) {
+        username.addClass("friend");
+      }
       var text = $('<div>').text(message.text);
       var time = $('<div>').text(message.createdAt);
       var msg = $('<div class = "chat">').append(username).append(text).append(time);
-      var msgId = message.objectId;
+      msg.attr('room', message.roomname);
+      if (!app.room || message.roomname === app.room) {
+        var msgId = message.objectId;
         app.objectIds[msgId]=true;
         $('#chats').prepend(msg);
+      }
     }
   },
   addRoom: function(room) {
@@ -57,6 +67,8 @@ var app = {
   },
   addFriend: function(username) {
     app.friends[username] = true;
+    app.clearMessages();
+    app.fetch();
   },
   handleSubmit: function(message) {
     app.send(message);
@@ -70,6 +82,13 @@ var app = {
       text += possible.charAt(Math.floor(Math.random() * possible.length));
     }
     return text;
+  },
+  room: "",
+  setRoom: function(room) {
+    app.room = room;
+    app.clearMessages();
+    app.fetch();
+    console.log(message);
   },
   objectIds: {}
 };
@@ -88,10 +107,6 @@ $(document).ready(function() {
     var msg = {
       username: "secret",
       text: text
-      //roomname: "lobby",
-      //createdAt: time,
-      //updatedAt: time,
-      //objectId: app.makeId()
     }
     event.preventDefault();
     app.handleSubmit(msg);
@@ -100,5 +115,10 @@ $(document).ready(function() {
   $('#refresh').on('submit', function(event) {
     event.preventDefault();
     app.fetch();
+  });
+  $('#select-room').on('submit', function(event) {
+    event.preventDefault();
+    var room = $('#room').val();
+    app.setRoom(room);
   })
 });
